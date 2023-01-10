@@ -3,6 +3,12 @@ uuid = "b59920ca-ae83-47b1-a52c-d6d89e4b4b86"
 authors = ["Matt Bhagat-Conway <matt@indicatrix.org> and contributors"]
 version = "0.1.0"
 
+[deps]
+ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
+Geodesy = "0ef565a4-170c-5f04-8de2-149903a85f3d"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+ThreadsX = "ac1d9e8a-700a-412c-b207-f0111f4b6c0d"
+
 [compat]
 julia = "1.8"
 
