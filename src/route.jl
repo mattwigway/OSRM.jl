@@ -7,10 +7,6 @@ struct Route
 end
 
 function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}) where T <: Real
-    if !osrm.running
-        error("OSRM is not running!")
-    end
-
     result = @ccall osrmjl.osrm_route(
         osrm._engine::Ptr{Any},
         convert(Float64, origin.lat)::Float64,

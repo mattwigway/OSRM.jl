@@ -9,6 +9,6 @@ include("instance.jl")
 include("matrix.jl")
 include("route.jl")
 
-export start_osrm, stop_osrm!, route, distance_matrix
+export OSRMInstance, route, distance_matrix
 
 end

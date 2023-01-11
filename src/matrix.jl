@@ -1,9 +1,5 @@
 
 function distance_matrix(osrm::OSRMInstance, origins::Vector{LatLon{T}}, destinations::Vector{LatLon{T}}) where T <: Real
-    if !osrm.running
-        error("OSRM is not running!")
-    end
-
     n_origins::Csize_t = length(origins)
     n_destinations::Csize_t = length(destinations)
     origin_lats::Vector{Float64} = map(c -> convert(Float64, c.lat), origins)
