@@ -89,7 +89,8 @@ extern "C" int distance_matrix(struct osrm::OSRM * osrm, size_t n_origins, doubl
 /**
  * Compute an OSRM point-to-point route.
  */
-extern "C" osrm::util::json::Object * osrm_route (struct osrm::OSRM * osrm, double origin_lat, double origin_lon, double destination_lat, double destination_lon) {
+extern "C" int osrm_route (struct osrm::OSRM * osrm, double origin_lat, double origin_lon, double destination_lat, double destination_lon,
+        int (*callback)(osrm::json::Object*, void*), void * result_array) {
     using namespace osrm;
 
     RouteParameters params;
@@ -102,12 +103,11 @@ extern "C" osrm::util::json::Object * osrm_route (struct osrm::OSRM * osrm, doub
 
     const auto status = osrm->Route(params, result);
 
-    //if (status != Status::Ok) return -1;
+    if (status != Status::Ok) return -1;
 
-    // reallocate result on heap to return to caller (TODO could we just use new above and avoid copy?)
-    auto * res = new json::Object(result.get<json::Object>());
+    auto result_body = result.get<json::Object>();
 
-    return res;
+    return callback(&result_body, result_array);
 }
 
 extern "C" osrm::json::Array * json_obj_get_arr (osrm::json::Object * obj, char * key) {
@@ -145,11 +145,6 @@ extern "C" const char * json_arr_get_string (osrm::json::Array * obj, size_t key
 extern "C" int json_arr_length (osrm::json::Array * arr) {
     return arr->values.size();
 }
-
-extern "C" void free_json (osrm::json::Object * jsobj) {
-    delete jsobj;
-}
-
 
 /**
  * Shut down an OSRM engine when it is no longer needed.
