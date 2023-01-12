@@ -41,3 +41,5 @@ target_compile_features(osrmjl PUBLIC cxx_std_17)
 target_link_libraries(osrmjl PRIVATE ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES} ${Boost_LIBRARIES})
 include_directories(SYSTEM ${LibOSRM_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LibOSRM_CXXFLAGS} ${Boost_CXXFLAGS}")
+
+install(TARGETS osrmjl DESTINATION lib)
