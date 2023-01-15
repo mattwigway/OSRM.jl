@@ -4,6 +4,7 @@ struct Route
     geometry::Union{Nothing, ArchGDAL.IGeometry{ArchGDAL.wkbLineString}}
     weight::Float64
     weight_name::String
+    nodes::Vector{Int64}
 end
 
 function parse_routes(result, resultptr)
@@ -45,6 +46,7 @@ function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}) wh
     return result
 end
 
+# parse the Json::Result from OSRM into Julia Route object
 function parse_route(rtptr::Ptr{Any})
     distance_meters = @ccall osrmjl.json_obj_get_number(rtptr::Ptr{Any}, "distance"::Cstring)::Cdouble
     duration_seconds = @ccall osrmjl.json_obj_get_number(rtptr::Ptr{Any}, "duration"::Cstring)::Cdouble
@@ -54,9 +56,25 @@ function parse_route(rtptr::Ptr{Any})
     geom_ptr = @ccall osrmjl.json_obj_get_obj(rtptr::Ptr{Any}, "geometry"::Cstring)::Ptr{Any}
     geom = parse_linestring(geom_ptr)
 
+    # extract the nodes
+    nodes = Int64[]
+
+    legs_ptr = @ccall osrmjl.json_obj_get_arr(rtptr::Ptr{Any}, "legs"::Cstring)::Ptr{Any}
+    n_legs = @ccall osrmjl.json_arr_length(legs_ptr::Ptr{Any})::Csize_t
+    for legidx in 0:(n_legs - 1)
+        leg_ptr = @ccall osrmjl.json_arr_get_obj(legs_ptr::Ptr{Any}, legidx::Csize_t)::Ptr{Any}
+        ann_ptr = @ccall osrmjl.json_obj_get_obj(leg_ptr::Ptr{Any}, "annotation"::Cstring)::Ptr{Any}
+        nodes_arr = @ccall osrmjl.json_obj_get_arr(ann_ptr::Ptr{Any}, "nodes"::Cstring)::Ptr{Any}
+        n_nodes = @ccall osrmjl.json_arr_length(nodes_arr::Ptr{Any})::Csize_t
+        for nodeidx in 0:(n_nodes - 1)
+            node = @ccall osrmjl.json_arr_get_number(nodes_arr::Ptr{Any}, nodeidx::Csize_t)::Cdouble
+            push!(nodes, convert(Int64, node))
+        end
+    end
+
     # unsafe_ because if ptr is not a string will be an issue. But ok to free the string on C side afterwars,
     # unsafe_string creates a protective copy
-    return Route(distance_meters, duration_seconds, geom, weight, unsafe_string(weight_name))
+    return Route(distance_meters, duration_seconds, geom, weight, unsafe_string(weight_name), nodes)
 end
 
 function parse_linestring(geom_ptr)

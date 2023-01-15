@@ -98,6 +98,7 @@ extern "C" int osrm_route (struct osrm::OSRM * osrm, double origin_lat, double o
     params.coordinates.push_back({util::FloatLongitude{destination_lon}, util::FloatLatitude{destination_lat}});
     params.geometries = RouteParameters::GeometriesType::GeoJSON;
     params.overview = RouteParameters::OverviewType::Full;
+    params.annotations = true;
 
     engine::api::ResultT result = json::Object();
 
