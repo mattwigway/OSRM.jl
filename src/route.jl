@@ -40,7 +40,8 @@ function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}) wh
     )::Cint
 
     if status != 0
-        error("Routing failed: OSRMJL status $status")
+        # routing failed
+        return Route[]
     end
 
     return result
