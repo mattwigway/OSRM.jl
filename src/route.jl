@@ -1,7 +1,7 @@
 struct Route
     distance_meters::Float64
     duration_seconds::Float64
-    geometry::Union{Nothing, ArchGDAL.IGeometry{ArchGDAL.wkbLineString}}
+    geometry::Union{Nothing, Vector{LatLon{Float64}}}
     weight::Float64
     weight_name::String
     nodes::Vector{Int64}
@@ -82,7 +82,7 @@ function parse_linestring(geom_ptr)
     geom_type = @ccall osrmjl.json_obj_get_string(geom_ptr::Ptr{Any}, "type"::Cstring)::Cstring
     unsafe_string(geom_type) == "LineString" || error("Expected LineString geometry, found $geom_type")
 
-    linestring = ArchGDAL.createlinestring()
+    linestring = LatLon{Float64}[]
     coords_ptr = @ccall osrmjl.json_obj_get_arr(geom_ptr::Ptr{Any}, "coordinates"::Cstring)::Ptr{Any}
     n_coords = @ccall osrmjl.json_arr_length(coords_ptr::Ptr{Any})::Csize_t
 
@@ -92,7 +92,7 @@ function parse_linestring(geom_ptr)
         n == 2 || error("wrong number of coordinates")
         lng = @ccall osrmjl.json_arr_get_number(coord_ptr::Ptr{Any}, 0::Csize_t)::Cdouble
         lat = @ccall osrmjl.json_arr_get_number(coord_ptr::Ptr{Any}, 1::Csize_t)::Cdouble
-        ArchGDAL.addpoint!(linestring, lng, lat)
+        push!(linestring, LatLon{Float64}(lat, lng))
     end
 
     return linestring
