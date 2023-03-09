@@ -35,8 +35,8 @@ find_package(Boost REQUIRED COMPONENTS regex date_time chrono filesystem iostrea
 link_directories(${LibOSRM_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 add_library(osrmjl SHARED osrmjl.cpp)
 
-# target c++ 17
-target_compile_features(osrmjl PUBLIC cxx_std_17)
+# target c++ 20, necessary for std::map.contains()
+target_compile_features(osrmjl PUBLIC cxx_std_20)
 
 target_link_libraries(osrmjl PRIVATE ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES} ${Boost_LIBRARIES})
 include_directories(SYSTEM ${LibOSRM_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
