@@ -119,7 +119,8 @@ function parse_leg(leg_ptr)
 end
 
 function parse_annotation(ann_ptr)
-    # all annotations are optional and can be disabled, in which case, json_obj_get_arr will return 
+    # all annotations are optional and can be disabled, in which case, json_obj_get_arr will return
+    # a RouteAnnotation with all fields containing `nothing`
     distance_ptr = json_obj_get_arr(ann_ptr, "distance")
     distance_meters = !isnothing(distance_ptr) ?
         map(i -> json_arr_get_number(distance_ptr, i), json_arr_indices(distance_ptr)) :
@@ -191,6 +192,7 @@ function parse_intersection(int_ptr)
     classes_ptr = json_obj_get_arr(int_ptr, "classes")
     classes = !isnothing(classes_ptr) ? map(i -> json_arr_get_string(classes_ptr, i), json_arr_indices(classes_ptr)) : nothing
 
+    # TODO json_arr_get_bool not working yet
     # entry_ptr = json_obj_get_arr(int_ptr, "entry")
     # entry = map(i -> json_arr_get_bool(entry_ptr, i), json_arr_indices(entry_ptr))
 
