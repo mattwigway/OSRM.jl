@@ -48,8 +48,8 @@ struct RouteLeg
     duration_seconds::Float64
     weight::Float64
     summary::String
-    steps::Vector{RouteStep}
-    annotation::RouteAnnotation
+    steps::Union{Nothing, Vector{RouteStep}}
+    annotation::Union{Nothing, RouteAnnotation}
 end
 
 struct Route
@@ -58,7 +58,7 @@ struct Route
     geometry::Union{Nothing, Vector{LatLon{Float64}}}
     weight::Float64
     weight_name::String
-    legs::Vector{RouteLeg}
+    legs::Union{Nothing, Vector{RouteLeg}}
 end
 
 function parse_routes(result, resultptr)
@@ -89,12 +89,16 @@ function parse_route(rtptr)
     geom_ptr = json_obj_get_obj(rtptr, "geometry")
     geom = parse_linestring(geom_ptr)
 
-    legs_ptr = json_obj_get_arr(rtptr, "legs")
-    n_legs = json_arr_length(legs_ptr)
+    legs = if json_obj_has_key(rtptr, "legs")
+        legs_ptr = json_obj_get_arr(rtptr, "legs")
+        n_legs = json_arr_length(legs_ptr)
 
-    legs = map(0:(n_legs - 1)) do legidx
-        leg_ptr = json_arr_get_obj(legs_ptr, legidx)
-        parse_leg(leg_ptr)
+        map(0:(n_legs - 1)) do legidx
+            leg_ptr = json_arr_get_obj(legs_ptr, legidx)
+            parse_leg(leg_ptr)
+        end
+    else
+        nothing
     end
 
     return Route(distance_meters, duration_seconds, geom, weight, weight_name, legs)
@@ -108,12 +112,16 @@ function parse_leg(leg_ptr)
     steps_ptr = json_obj_get_arr(leg_ptr, "steps")
     ann_ptr = json_obj_get_obj(leg_ptr, "annotation")
 
-    steps = map(json_arr_indices(steps_ptr)) do idx
-        step_ptr = json_arr_get_obj(steps_ptr, idx)
-        parse_step(step_ptr)
+    steps = if !isnothing(steps_ptr) && json_arr_length(steps_ptr) > 0
+        map(json_arr_indices(steps_ptr)) do idx
+            step_ptr = json_arr_get_obj(steps_ptr, idx)
+            parse_step(step_ptr)
+        end
+    else
+        nothing
     end
 
-    annotation = parse_annotation(ann_ptr)
+    annotation = isnothing(ann_ptr) ? nothing : parse_annotation(ann_ptr)
 
     return RouteLeg(distance_meters, duration_seconds, weight, summary, steps, annotation)
 end
@@ -241,6 +249,7 @@ function parse_linestring(geom_ptr)
     return linestring
 end
 
+<<<<<<< HEAD
 function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}; origin_hint=nothing, destination_hint=nothing) where T <: Real
     result = Route[]
 
@@ -248,6 +257,13 @@ function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}; or
 
     parse_routes_c = @cfunction(parse_routes, Cint, (Ptr{Any}, Ptr{Any}))
 
+=======
+const parse_routes_c = @cfunction(parse_routes, Cint, (Ptr{Any}, Ptr{Any}))
+
+function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}) where T <: Real
+    result = Route[]
+
+>>>>>>> 72a068f (Proof of concept on map-matching)
     status = @ccall osrmjl.osrm_route(
         osrm._engine::Ptr{Any},
         convert(Float64, origin.lat)::Float64,

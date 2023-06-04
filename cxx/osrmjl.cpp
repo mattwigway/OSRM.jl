@@ -169,7 +169,9 @@ extern "C" int json_arr_length (osrm::json::Array * arr) {
 }
 
 extern "C" bool json_obj_has_key (osrm::json::Object * obj, char * key) {
-    return obj->values.contains(key);
+    // don't use contains, mapbox variant compile fails with C++20
+    // https://www.techiedelight.com/determine-if-a-key-exists-in-a-map-in-cpp/
+    return obj->values.count(key) == 1;
 }
 
 /**
