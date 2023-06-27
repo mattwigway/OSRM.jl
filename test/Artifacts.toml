@@ -1,0 +1,6 @@
+[st_paul_south_osm]
+git-tree-sha1 = "5cabab51ef170f139adecc5d4648a4516083783f"
+
+    [[st_paul_south_osm.download]]
+    sha256 = "a638563a4963bff12f82045c7210759aa00de70c5ebec92769bc40c292c6fb26"
+    url = "https://gist.github.com/mattwigway/48cc83dca68152209d77f9783b26916f/raw/5cabab51ef170f139adecc5d4648a4516083783f.tar.gz"

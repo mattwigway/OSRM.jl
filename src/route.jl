@@ -241,8 +241,10 @@ function parse_linestring(geom_ptr)
     return linestring
 end
 
-function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}) where T <: Real
+function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}; origin_hint=nothing, destination_hint=nothing) where T <: Real
     result = Route[]
+
+    isnothing(origin_hint) == isnothing(destination_hint) || error("Origin and destination hints must either both be present, or both not be present!")
 
     parse_routes_c = @cfunction(parse_routes, Cint, (Ptr{Any}, Ptr{Any}))
 
@@ -252,6 +254,8 @@ function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}) wh
         convert(Float64, origin.lon)::Float64,
         convert(Float64, destination.lat)::Float64,
         convert(Float64, destination.lon)::Float64,
+        (isnothing(origin_hint) ? C_NULL : origin_hint)::Cstring,
+        (isnothing(destination_hint) ? C_NULL : destination_hint)::Cstring,
         parse_routes_c::Ptr{Any},
         (pointer_from_objref(result))::Ptr{Any}
     )::Cint

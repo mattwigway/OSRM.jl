@@ -37,7 +37,8 @@ extern "C" struct osrm::OSRM * init_osrm (char * osrm_path, char * algorithm) {
  * by init_osrm on the Julia side). Write results into the durations and distances arrays.
  */
 extern "C" int distance_matrix(struct osrm::OSRM * osrm, size_t n_origins, double * origin_lats, double * origin_lons,
-    size_t n_destinations, double * destination_lats, double * destination_lons, double * durations, double * distances) {
+    size_t n_destinations, double * destination_lats, double * destination_lons, 
+    int (*callback)(osrm::json::Object*, void*), void * result_obj) {
     using namespace osrm;
 
     // Create table parameters. concatenate origins and destinations into coordinates, set origin/destination references.
@@ -62,34 +63,14 @@ extern "C" int distance_matrix(struct osrm::OSRM * osrm, size_t n_origins, doubl
 
     auto &json_result = result.get<json::Object>();
 
-    std::vector<json::Value> jdurations = json_result.values["durations"].get<json::Array>().values;
-    std::vector<json::Value> jdistances = json_result.values["distances"].get<json::Array>().values;
-
-    // copy it into the result array
-    // jdurations, jdistances are multidimensional arrays
-
-    for (size_t destination = 0; destination < n_destinations; destination++) {
-        for (size_t origin = 0; origin < n_origins; origin++) {
-            // julia arrays: col-major order
-            const size_t off = destination * n_origins + origin;
-
-            const auto duration = jdurations.at(origin).get<json::Array>().values.at(destination);
-            if (duration.is<json::Null>()) durations[off] = NAN;
-            else durations[off] = double(duration.get<json::Number>().value);
-
-            const auto distance = jdistances.at(origin).get<json::Array>().values.at(destination);
-            if (distance.is<json::Null>()) distances[off] = NAN;
-            else distances[off] = double(distance.get<json::Number>().value);
-        }
-    }
-
-    return 0;
+    return callback(&json_result, result_obj);
 }
 
 /**
  * Compute an OSRM point-to-point route.
  */
 extern "C" int osrm_route (struct osrm::OSRM * osrm, double origin_lat, double origin_lon, double destination_lat, double destination_lon,
+        char * origin_hint, char * destination_hint,
         int (*callback)(osrm::json::Object*, void*), void * result_array) {
     using namespace osrm;
 
@@ -100,6 +81,12 @@ extern "C" int osrm_route (struct osrm::OSRM * osrm, double origin_lat, double o
     params.overview = RouteParameters::OverviewType::Full;
     params.annotations = true;
     params.steps = true;
+
+    // error will be raised on the Julia side if they're not both NULL or non-NULL
+    if (origin_hint != NULL && destination_hint != NULL) {
+        params.hints.push_back(osrm::engine::Hint::FromBase64(std::string(origin_hint)));
+        params.hints.push_back(osrm::engine::Hint::FromBase64(std::string(destination_hint)));
+    }
 
     engine::api::ResultT result = json::Object();
 
