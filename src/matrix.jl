@@ -3,7 +3,7 @@ struct Waypoint
     # TODO other waypoint attrs
 end
 
-mutable struct MatrixResult
+struct MatrixResult
     duration_seconds::Matrix{Float64}
     distance_meters::Matrix{Float64}
     origin_waypoints::Vector{Waypoint}
@@ -12,9 +12,25 @@ end
 
 function parse_matrix(json::Ptr{Any}, resultptr::Ptr{Any})
     try
-        result = unsafe_pointer_to_objref(resultptr)::MatrixResult
+        result_arr = unsafe_pointer_to_objref(resultptr)::Vector{MatrixResult}
         durations = json_obj_get_arr(json, "durations")
         distances = json_obj_get_arr(json, "distances")
+
+        sources = json_obj_get_arr(json, "sources")
+        destinations = json_obj_get_arr(json, "destinations")
+
+
+        n_origins = json_arr_length(sources)
+        n_destinations = json_arr_length(destinations)
+
+        result = MatrixResult(
+            fill(-1.0, (n_origins, n_destinations))::Array{Float64, 2},
+            fill(-1.0, (n_origins, n_destinations))::Array{Float64, 2},
+            Waypoint[],
+            Waypoint[]
+        )
+
+        push!(result_arr, result)
         
         for origin in json_arr_indices(durations) 
             origin_durations = json_arr_get_arr(durations, origin)
@@ -25,14 +41,12 @@ function parse_matrix(json::Ptr{Any}, resultptr::Ptr{Any})
             end
         end
 
-        sources = json_obj_get_arr(json, "sources")
         for wayptidx in json_arr_indices(sources)
             jway = json_arr_get_obj(sources, wayptidx)
             waypoint = Waypoint(json_obj_get_string(jway, "hint"))
             push!(result.origin_waypoints, waypoint)
         end
 
-        destinations = json_obj_get_arr(json, "destinations")
         for wayptidx in json_arr_indices(destinations)
             jway = json_arr_get_obj(destinations, wayptidx)
             waypoint = Waypoint(json_obj_get_string(jway, "hint"))
@@ -54,13 +68,12 @@ function distance_matrix(osrm::OSRMInstance, origins::Vector{LatLon{T}}, destina
     destination_lats::Vector{Float64} = map(c -> convert(Float64, c.lat), destinations)
     destination_lons::Vector{Float64} = map(c -> convert(Float64, c.lon), destinations)
 
-    result = MatrixResult(
-        fill(-1.0, (n_origins, n_destinations))::Array{Float64, 2},
-        fill(-1.0, (n_origins, n_destinations))::Array{Float64, 2},
-        Waypoint[],
-        Waypoint[]
-    )
+    # There is only one result, but use a vector as a container since immutable structs cannot be passed to
+    # C functions as pointers.
+    result = MatrixResult[]
 
+    # This has to be created in the function body. Creating it outside (e.g. as a const)
+    # seems like it would be more efficient but causes a segfault.
     parse_matrix_c = @cfunction(parse_matrix, Cint, (Ptr{Any}, Ptr{Any}))
 
     stat = @ccall osrmjl.distance_matrix(
@@ -79,5 +92,6 @@ function distance_matrix(osrm::OSRMInstance, origins::Vector{LatLon{T}}, destina
         error("osrm failed, status $stat")
     end
 
-    return result
+    @assert length(result) == 1
+    return result[1]
 end
