@@ -30,7 +30,6 @@ if(WIN32 AND MSVC_VERSION LESS 1900)
 endif()
 
 find_package(LibOSRM REQUIRED)
-find_package(Boost REQUIRED COMPONENTS regex date_time chrono filesystem iostreams thread system)
 
 link_directories(${LibOSRM_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 add_library(osrmjl SHARED osrmjl.cpp match.cpp json.cpp)
