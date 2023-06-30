@@ -48,6 +48,43 @@ function parse_tracepoint(pointsptr, index)
     end
 end
 
+"""
+```
+mapmatch(
+        osrm::OSRMInstance,
+        points;
+        timestamps,
+        std_error_meters::Union{Nothing, <:Real, <:AbstractVector{<:Real}}=nothing,
+        tidy=false,
+        annotations=false,
+        steps=false,
+        split_gaps=true
+        )
+```
+
+Perform map matching using OSRM.
+
+The only required arguments are an OSRMInstance and geometry to match (represented as a vector of `LatLon`s). You can additionally
+provide timestamps for each of the points (as a vector of Julia `DateTime` objects), and standard errors for the GPS points. The
+standard error can either be a scalar or a vector of the same length as the number of points. OSRM will (as of this writing) search
+for matching roads up to `3 * std_error_meters` meters from each point. Higher numbers make the algorithm significantly slower.
+
+- `tidy` allows OSRM to modify the input to clean it up
+- `annotations` includes annotations in the returned routes. The annotations include the OSM node IDs the route uses.
+- `steps` includes turn-by-turn directions
+- `split_gaps` instructs OSRM to split the trace when there is a large gap between timestamps.
+
+The result is a MapMatchResult object, which has several attributes.
+
+- `matchings` contains a vector of Routes (like those returned by `route()`) of the matched routes. The most interesting attributes will likely be `geometry`
+    (the snapped geometry) and `annotation.nodes` (the OSM nodes passed through)
+- `confidence` is a value between 0 and 1 with OSRM's confidence in each route
+- `tracepoints` contains information on where each point was snapped to. Note that points that could not be snapped will have the value `nothing`.
+    They are skipped in map matching, and if they occur at the start or end of the trace (or if there is only one snapped point before/after them),
+    the trace will be truncated.
+
+More details on map matching in OSRM are availble in the [OSRM API docs](http://project-osrm.org/docs/v5.24.0/api/#match-service).
+"""
 function mapmatch(
         osrm::OSRMInstance,
         points::AbstractVector{LatLon{Float64}};
