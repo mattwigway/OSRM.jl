@@ -249,7 +249,6 @@ function parse_linestring(geom_ptr)
     return linestring
 end
 
-<<<<<<< HEAD
 function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}; origin_hint=nothing, destination_hint=nothing) where T <: Real
     result = Route[]
 
@@ -257,13 +256,6 @@ function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}; or
 
     parse_routes_c = @cfunction(parse_routes, Cint, (Ptr{Any}, Ptr{Any}))
 
-=======
-const parse_routes_c = @cfunction(parse_routes, Cint, (Ptr{Any}, Ptr{Any}))
-
-function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}) where T <: Real
-    result = Route[]
-
->>>>>>> 72a068f (Proof of concept on map-matching)
     status = @ccall osrmjl.osrm_route(
         osrm._engine::Ptr{Any},
         convert(Float64, origin.lat)::Float64,

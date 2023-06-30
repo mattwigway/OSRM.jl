@@ -20,7 +20,7 @@ extern "C" int osrm_match (struct osrm::OSRM * osrminst, double * lats, double *
     unsigned * timestamps, size_t n_timestamps,
     double * radii, size_t n_radii,
     bool tidy, bool annotations, bool steps, bool split_gaps,
-    int (*callback)(osrm::json::Value*, void*), void * result_array) {
+    int (*callback)(osrm::json::Object*, void*), void * result_array) {
     
     using namespace osrm;
 
@@ -64,7 +64,8 @@ extern "C" int osrm_match (struct osrm::OSRM * osrminst, double * lats, double *
     Status stat = osrminst->Match(params, result);
 
     if (stat == Status::Ok) {
-        return callback(&result, result_array);
+        auto &json_result = result.get<json::Object>();
+        return callback(&json_result, result_array);
     } else {
         auto code = result.get<json::Object>().values.at("code").get<osrm::json::String>().value.c_str();
         cout << "OSRM error: " << code << endl;
