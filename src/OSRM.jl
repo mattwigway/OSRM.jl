@@ -10,6 +10,7 @@ include("json.jl")
 include("instance.jl")
 include("matrix.jl")
 include("route.jl")
+include("toolchain/toolchain.jl")
 
 export OSRMInstance, route, distance_matrix
 
