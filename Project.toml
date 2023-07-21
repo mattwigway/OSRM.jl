@@ -9,7 +9,10 @@ ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 EnumX = "4e289a0a-7415-4d19-859d-a7e5c4648b56"
 Geodesy = "0ef565a4-170c-5f04-8de2-149903a85f3d"
+Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+Mmap = "a63ad114-7e13-5084-954f-fe012c677804"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+Tar = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 ThreadsX = "ac1d9e8a-700a-412c-b207-f0111f4b6c0d"
 
 [compat]
