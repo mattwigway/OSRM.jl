@@ -7,12 +7,6 @@ struct EdgeBasedEdge
     _duration_and_direction::UInt32
 end
 
-const DurationAndDirection = BitFields(
-    BitField(UInt32, :duration, 30, 0),
-    BitField(UInt32, :forward, 1, 30),
-    BitField(UInt32, :backward, 1, 30)
-)
-
 # unpack bit fields
 @inline function Base.getproperty(e::EdgeBasedEdge, p::Symbol)
     if p == :duration
