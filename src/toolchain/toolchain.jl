@@ -21,6 +21,9 @@ include("properties.jl")
 struct OSRMToolchain
     edge_based_edges::AbstractVector{EdgeBasedEdge}
     edge_based_nodes::AbstractVector{EdgeBasedNode}
+    edge_based_node_weights::AbstractVector{Weight}
+    edge_based_node_durations::AbstractVector{Float32}
+    edge_based_node_distances::AbstractVector{Float32}
     edge_based_node_annotations::AbstractVector{NodeBasedEdgeAnnotation}
     geometry::GeometryVector
     node_coordinates::AbstractVector{Coordinate}
@@ -36,9 +39,14 @@ function OSRMToolchain(osrm)
         @warn "OSRM toolchains only tested on little-endian systems, but running on a big-endian system"
     end
 
+    weights = read_edge_based_node_weights(osrm)
+
     OSRMToolchain(
         load_edge_based_edges(osrm),
         load_edge_based_nodes(osrm),
+        weights.weights,
+        weights.durations,
+        weights.distances,
         load_edge_based_node_annotations(osrm),
         load_geometry(osrm),
         load_node_coordinates(osrm),
