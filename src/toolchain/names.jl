@@ -91,6 +91,11 @@ function read_names(osrm)
         read_block!(block, next.offset, namefile, names)
     end
 
+    # read the last block
+    # next_offset is end of file, function assumes it is zero based since that is how recorded
+    # in the blocks file
+    read_block!(last(blocks), length(namefile), namefile, names)
+
     close(nametar)
 
     return map(Name, zip(

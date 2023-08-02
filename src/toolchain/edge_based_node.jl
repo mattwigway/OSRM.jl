@@ -35,3 +35,42 @@ function load_edge_based_nodes(osrm)
     ebnlistraw = @view get_member(ebgn, "/common/ebg_node_data/nodes")[1:(n_ebn * sizeof(EdgeBasedNode))]
     return reinterpret(reshape, EdgeBasedNode, reshape(ebnlistraw, sizeof(EdgeBasedNode), :))
 end
+
+struct Weight
+    _weight::Int32
+end
+
+@inline function Base.getproperty(w::Weight, s::Symbol)
+    if s == :weight
+        getbits(w._weight, 1, 31)
+    elseif s == :oneway
+        convert(Bool, getbits(w._weight, 32))
+    else
+        Base.getfield(w, s)
+    end
+end
+
+
+# Edge-based node weights, durations, and distances are stored in a separate file with parallel
+# arrays
+
+function read_edge_based_node_weights(osrm)
+    ebwn = read_tar_mmap(osrm * ".enw", strict=false)
+
+    # weights
+    n_weights = read_count(ebwn, "/extractor/edge_based_node_weights.meta")
+    weightsraw = @view get_member(ebwn, "/extractor/edge_based_node_weights")[1:n_weights * sizeof(Weight)]
+    weights = reinterpret(reshape, Weight, reshape(weightsraw, sizeof(Weight), :))
+
+    # durations
+    n_durations = read_count(ebwn, "/extractor/edge_based_node_durations.meta")
+    durationsraw = @view get_member(ebwn, "/extractor/edge_based_node_durations")[1:n_durations * sizeof(Int32)]
+    durations = reinterpret(reshape, Int32, reshape(durationsraw, sizeof(Int32), :))
+
+    # durations
+    n_distances = read_count(ebwn, "/extractor/edge_based_node_distances.meta")
+    distancesraw = @view get_member(ebwn, "/extractor/edge_based_node_distances")[1:n_distances * sizeof(Float32)]
+    distances = reinterpret(reshape, Float32, reshape(distancesraw, sizeof(Float32), :))
+
+    return (weights=weights, durations=durations, distances=distances)
+end
