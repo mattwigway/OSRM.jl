@@ -26,6 +26,7 @@ struct OSRMToolchain
     edge_based_node_distances::AbstractVector{Float32}
     edge_based_node_annotations::AbstractVector{NodeBasedEdgeAnnotation}
     geometry::GeometryVector
+    node_ids::AbstractVector{Int64}
     node_coordinates::AbstractVector{Coordinate}
     class_names::AbstractVector{String}
     # TODO the indices here don't match OSRM, or even off by one, because OSRM uses a flat array of names, so each name takes five slots
@@ -49,6 +50,7 @@ function OSRMToolchain(osrm)
         weights.distances,
         load_edge_based_node_annotations(osrm),
         load_geometry(osrm),
+        load_node_ids(osrm),
         load_node_coordinates(osrm),
         read_class_names(osrm),
         read_names(osrm)
