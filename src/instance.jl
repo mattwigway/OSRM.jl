@@ -12,7 +12,15 @@ mutable struct OSRMInstance
             error("Algorithm must be 'mld' for Multi-Level Dijkstra, or 'ch' for Contraction Hierarchies.")
         end
 
+        # Check for file existence
+
         ptr = @ccall osrmjl.init_osrm(file_path::Cstring, algorithm::Cstring)::Ptr{Any}
+
+        if ptr == C_NULL
+            # TODO would be better to get the actual error here
+            error("Error initializing OSRM (see stderr).")
+        end
+
         result = new(ptr, file_path, algorithm)
 
         finalizer(result) do osrm

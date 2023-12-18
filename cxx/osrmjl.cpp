@@ -27,9 +27,13 @@ extern "C" struct osrm::OSRM * init_osrm (char * osrm_path, char * algorithm) {
     else if (strcmp(algorithm, "mld") == 0) config.algorithm = EngineConfig::Algorithm::MLD;
     else throw std::runtime_error("algorithm must be 'ch' or 'mld'");
 
-    osrm::OSRM * engn = new osrm::OSRM(config);
-
-    return engn;
+    try {
+        osrm::OSRM * engn = new osrm::OSRM(config);
+        return engn;
+    } catch (osrm::util::exception e) {
+        std::cerr << e.what() << "\n";
+        return nullptr;
+    }
 }
 
 /**
@@ -169,7 +173,9 @@ extern "C" int json_arr_length (osrm::json::Array * arr) {
 }
 
 extern "C" bool json_obj_has_key (osrm::json::Object * obj, char * key) {
-    return obj->values.contains(key);
+    // don't use contains, mapbox variant compile fails with C++20
+    // https://www.techiedelight.com/determine-if-a-key-exists-in-a-map-in-cpp/
+    return obj->values.count(key) == 1;
 }
 
 /**
