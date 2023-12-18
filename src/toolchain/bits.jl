@@ -1,6 +1,6 @@
 # helper functions for bitwise operations
 "Create a bitmask with all bits from fr to to (inclusive, one-based) set"
-bitmask(T, fr, to=fr) = mapfoldl(x -> one(T) << (x - 1), |, fr:to)
+bitmask(T, fr, to=fr) = to ≥ fr ? mapfoldl(x -> one(T) << (x - 1), |, fr:to) : error("Must specify non-empty bit range (got $fr:$to)")
 
 "Get the bits from from to to of v (one-based)"
 getbits(v, fr, to=fr) = (v & bitmask(typeof(v), fr, to)) >>> (fr - 1)
