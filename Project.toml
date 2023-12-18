@@ -1,7 +1,7 @@
 name = "OSRM"
 uuid = "b59920ca-ae83-47b1-a52c-d6d89e4b4b86"
 authors = ["Matt Bhagat-Conway <matt@indicatrix.org> and contributors"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
