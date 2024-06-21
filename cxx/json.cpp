@@ -3,27 +3,24 @@
 // Functions for working with JSON
 
 extern "C" bool json_obj_member_is_null (osrm::json::Object * obj, char * key) {
-    return obj->values.at(key).match(
-        [] (osrm::json::Null) { return true; },
-        // https://github.com/mapbox/variant/issues/140
-        [] (auto) { return false; }
-    );
+    return std::holds_alternative<osrm::json::Null>(obj->values.at(key));
 }
 
 extern "C" osrm::json::Array * json_obj_get_arr (osrm::json::Object * obj, char * key) {
-    return & (obj->values.at(key).get<osrm::json::Array>());
+    return & std::get<osrm::json::Array>(obj->values.at(key));
 }
 
 extern "C" osrm::json::Object * json_obj_get_obj (osrm::json::Object * obj, char * key) {
-    return & (obj->values.at(key).get<osrm::json::Object>());
+    return & std::get<osrm::json::Object>(obj -> values.at(key));
 }
 
 extern "C" double json_obj_get_number (osrm::json::Object * obj, char * key) {
-    return (obj->values.at(key).get<osrm::json::Number>().value);
+    return std::get<osrm::json::Number>(obj->values.at(key)).value;
 }
 
 extern "C" const char * json_obj_get_string (osrm::json::Object * obj, char * key) {
-    return (obj->values.at(key).get<osrm::json::String>().value.c_str());
+    // TODO should this have a &?
+    return std::get<osrm::json::String>(obj->values.at(key)).value.c_str();
 }
 
 // extern "C" bool json_arr_get_bool (osrm::json::Array * obj, size_t key) {
@@ -33,27 +30,23 @@ extern "C" const char * json_obj_get_string (osrm::json::Object * obj, char * ke
 // }
 
 extern "C" bool json_arr_member_is_null (osrm::json::Array * obj, size_t key) {
-    return obj->values.at(key).match(
-        [] (osrm::json::Null) { return true; },
-        // https://github.com/mapbox/variant/issues/140
-        [] (auto) { return false; }
-    );
+    return std::holds_alternative<osrm::json::Null>(obj -> values.at(key));
 }
 
 extern "C" osrm::json::Array * json_arr_get_arr (osrm::json::Array * obj, size_t key) {
-    return & (obj->values.at(key).get<osrm::json::Array>());
+    return & std::get<osrm::json::Array>(obj -> values.at(key));
 }
 
 extern "C" osrm::json::Object * json_arr_get_obj (osrm::json::Array * obj, size_t key) {
-    return & (obj->values.at(key).get<osrm::json::Object>());
+    return & std::get<osrm::json::Object>(obj -> values.at(key));
 }
 
 extern "C" double json_arr_get_number (osrm::json::Array * obj, size_t key) {
-    return (obj->values.at(key).get<osrm::json::Number>().value);
+    return std::get<osrm::json::Number>(obj -> values.at(key)).value;
 }
 
 extern "C" const char * json_arr_get_string (osrm::json::Array * obj, size_t key) {
-    return (obj->values.at(key).get<osrm::json::String>().value.c_str());
+    return std::get<osrm::json::String>(obj -> values.at(key)).value.c_str();
 }
 
 extern "C" int json_arr_length (osrm::json::Array * arr) {
@@ -61,7 +54,5 @@ extern "C" int json_arr_length (osrm::json::Array * arr) {
 }
 
 extern "C" bool json_obj_has_key (osrm::json::Object * obj, char * key) {
-    // don't use contains, mapbox variant compile fails with C++20
-    // https://www.techiedelight.com/determine-if-a-key-exists-in-a-map-in-cpp/
-    return obj->values.count(key) == 1;
+    return obj->values.contains(key);
 }

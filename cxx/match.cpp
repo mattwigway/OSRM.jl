@@ -64,10 +64,10 @@ extern "C" int osrm_match (struct osrm::OSRM * osrminst, double * lats, double *
     Status stat = osrminst->Match(params, result);
 
     if (stat == Status::Ok) {
-        auto &json_result = result.get<json::Object>();
+        auto &json_result = std::get<json::Object>(result);
         return callback(&json_result, result_array);
     } else {
-        auto code = result.get<json::Object>().values.at("code").get<osrm::json::String>().value.c_str();
+        auto code = std::get<osrm::json::String>(std::get<json::Object>(result).values.at("code")).value.c_str();
         cout << "OSRM error: " << code << endl;
         return -1;
     }

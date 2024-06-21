@@ -30,12 +30,14 @@ if(WIN32 AND MSVC_VERSION LESS 1900)
 endif()
 
 find_package(LibOSRM REQUIRED)
+# https://stackoverflow.com/questions/1065672
+find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 link_directories(${LibOSRM_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 add_library(osrmjl SHARED osrmjl.cpp match.cpp json.cpp)
 
 # target c++ 20, necessary for std::map.contains()
-target_compile_features(osrmjl PUBLIC cxx_std_17)
+target_compile_features(osrmjl PUBLIC cxx_std_20)
 
 target_link_libraries(osrmjl PRIVATE ${LibOSRM_LIBRARIES} ${LibOSRM_DEPENDENT_LIBRARIES} ${Boost_LIBRARIES})
 include_directories(SYSTEM ${LibOSRM_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
