@@ -8,6 +8,7 @@
 #include <math.h>
 
 #include <cstdlib>
+#include <iostream>
 
 // set up wrapper functions so we can use ccall in julia to call out to cpp osrm
 // see https://isocpp.org/wiki/faq/mixing-c-and-cpp#overview-mixing-langs
