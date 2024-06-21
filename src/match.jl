@@ -116,7 +116,7 @@ function mapmatch(
         timestamps
     end
 
-    status = @ccall osrmjl.osrm_match(
+    status = @ccall libosrmjl.osrm_match(
         osrm._engine::Ptr{Any},
         [x.lat for x in points]::Ptr{Float64},
         [x.lon for x in points]::Ptr{Float64},
