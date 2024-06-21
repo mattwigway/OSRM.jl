@@ -11,11 +11,8 @@ include("json.jl")
 include("instance.jl")
 include("matrix.jl")
 include("route.jl")
-<<<<<<< HEAD
 include("toolchain/toolchain.jl")
-=======
 include("match.jl")
->>>>>>> match
 
 export OSRMInstance, route, distance_matrix, mapmatch
 

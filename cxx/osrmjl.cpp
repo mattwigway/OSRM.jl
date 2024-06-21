@@ -104,7 +104,6 @@ extern "C" int osrm_route (struct osrm::OSRM * osrm, double origin_lat, double o
     return callback(&result_body, result_array);
 }
 
-<<<<<<< HEAD
 // instead of having a bool type, OSRM has a true and a false type. This visitor will
 // evaluate which is present and .getvalue will return true or false
 // struct BoolVisitor {
@@ -180,8 +179,6 @@ extern "C" bool json_obj_has_key (osrm::json::Object * obj, char * key) {
     return obj->values.count(key) == 1;
 }
 
-=======
->>>>>>> match
 /**
  * Shut down an OSRM engine when it is no longer needed.
  */
