@@ -8,23 +8,10 @@
     mktempdir() do tempdir
         # copy the st paul south OSM file
         cp(joinpath(artifact"st_paul_south_osm", "st_paul_south.osm.pbf"), joinpath(tempdir, "st_paul_south.osm.pbf"))
-
-        # find foot.lua
-        # TODO this is probably fragile
-        osrm_path = readchomp(`which osrm-extract`)
-        car_lua_path = joinpath(dirname(dirname(osrm_path)), "share", "osrm", "profiles", "car.lua")
-
-        isfile(car_lua_path) || error("locating car.lua failed")
-
-        # build the graph (MLD)
-        osmpath = joinpath(tempdir, "st_paul_south.osm.pbf")
-        netpath = joinpath(tempdir, "st_paul_south.osm.pbf")
-        run(`osrm-extract -p $car_lua_path $osmpath`, wait=true)
-        run(`osrm-partition $netpath`, wait=true)
-        run(`osrm-customize $netpath`, wait=true)
+        netpath = OSRM.build(joinpath(tempdir, "st_paul_south.osm.pbf"), OSRM.Profiles.Car, OSRM.Algorithm.MultiLevelDijkstra)
 
         # Load up OSRM
-        osrm = OSRMInstance(netpath, "mld")
+        osrm = OSRMInstance(netpath, OSRM.Algorithm.MultiLevelDijkstra)
 
         # First a very simple map matching south of St Paul
         path = [
