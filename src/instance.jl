@@ -17,7 +17,7 @@ mutable struct OSRMInstance
     function OSRMInstance(file_path::String, algorithm::OSRM.Algorithm.T)
         # Check for file existence
 
-        ptr = @ccall libosrmjl.init_osrm(file_path::Cstring, repr(algorithm)::Cstring)::Ptr{Any}
+        ptr = @ccall libosrmjl.init_osrm(file_path::Cstring, get_abbr(algorithm)::Cstring)::Ptr{Any}
 
         if ptr == C_NULL
             # TODO would be better to get the actual error here

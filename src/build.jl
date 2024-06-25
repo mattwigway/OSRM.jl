@@ -36,10 +36,10 @@ function build(osmpbf, profile, algorithm::Algorithm.T)
     @info "Extracting $osmpbf to network $(netname).* using profile $profile"
     run(`$(osrm_extract()) $osmpbf -p $profile`)
 
-    if algorithm == Algorithm.CH
+    if algorithm == Algorithm.ContractionHierarchies
         @info "Contracting $netname"
         run(`$(osrm_contract()) $(netname)`)
-    elseif algorithm == Algorithm.MLD
+    elseif algorithm == Algorithm.MultiLevelDijkstra
         run(`$(osrm_partition()) $(netname)`)
         run(`$(osrm_customize()) $(netname)`)
     end
