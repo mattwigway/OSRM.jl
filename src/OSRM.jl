@@ -17,8 +17,12 @@ function __init__()
     # to load them manually. Even though we don't use any functions from libosrm.so directly,
     # we have to dlopen it first so that it is available when we load libosrmjl.so - because
     # libosrm.so is not on the loadpath for libosrmjl.so. H/T Mosé Giordano.
-    dlopen(OSRM_jll.libosrm_path)
-    dlopen(osrmjl_jll.libosrmjl_path)
+    if OSRM_jll.is_available() && osrmjl_jll.is_available()
+        dlopen(OSRM_jll.libosrm_path)
+        dlopen(osrmjl_jll.libosrmjl_path)
+    else
+        error("OSRM and libosrmjl are required to use OSRM.jl")
+    end
 end
 
 include("json.jl")
