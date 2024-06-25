@@ -12,9 +12,9 @@ The profile is a Lua profile that specifies how to weight and process the OSM da
 (e.g. for bicycles, for cars, for bicycles avoiding busy streets, etc.). It can either
 be a path to a custom Lua file, or one of the members of OSRM.Profiles.
 
-The algorithm is OSRM.Algorithm.CH (contraction hierarchies) or
-OSRM.Algorithm.MLD (multi-level Dijkstra). CH performs better for computing distance
-matrices, and MLD is preferred for other applications (though both will work with all
+The algorithm is OSRM.Algorithm.ContractionHierarchies or
+OSRM.Algorithm.MultiLevelDijkstra. Contraction hierarchies performs better for computing distance
+matrices, and multi-level Dijkstra is preferred for other applications (though both will work with all
 OSRM functions).
 
 The resulting network will be stored in the same directory and with the same name as the

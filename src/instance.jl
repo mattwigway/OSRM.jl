@@ -1,8 +1,8 @@
-@enumx Algorithm CH MLD
-Base.show(io::IO, a::Algorithm.T) = if a == Algorithm.CH
-    print(io, "ch")
-elseif a == Algorithm.MLD
-    print(io, "mld")
+@enumx Algorithm ContractionHierarchies MultiLevelDijkstra
+get_abbr(a::Algorithm.T) = if a == Algorithm.ContractionHierarchies
+    "ch"
+elseif a == Algorithm.MultiLevelDijkstra
+    "mld"
 else
     error("Unrecognized algorithm")
 end
