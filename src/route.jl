@@ -256,7 +256,7 @@ function route(osrm::OSRMInstance, origin::LatLon{T}, destination::LatLon{T}; or
 
     parse_routes_c = @cfunction(parse_routes, Cint, (Ptr{Any}, Ptr{Any}))
 
-    status = @ccall osrmjl.osrm_route(
+    status = @ccall libosrmjl.osrm_route(
         osrm._engine::Ptr{Any},
         convert(Float64, origin.lat)::Float64,
         convert(Float64, origin.lon)::Float64,

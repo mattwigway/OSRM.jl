@@ -76,7 +76,7 @@ function distance_matrix(osrm::OSRMInstance, origins::Vector{LatLon{T}}, destina
     # seems like it would be more efficient but causes a segfault.
     parse_matrix_c = @cfunction(parse_matrix, Cint, (Ptr{Any}, Ptr{Any}))
 
-    stat = @ccall osrmjl.distance_matrix(
+    stat = @ccall libosrmjl.distance_matrix(
         osrm._engine::Ptr{Any},
         n_origins::Csize_t,
         origin_lats::Ptr{Float64},
