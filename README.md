@@ -75,3 +75,7 @@ Each leg object contains the following:
 - `annotation`: An annotation object, which contains more information about the OSM nodes the leg uses
 
 The main attribute of interest in the annotation object is the `nodes` member, which is a vector of OSM node IDs that the leg used.
+
+## Multithreading
+
+OSRM routing and mapmatching functions are thread-safe. Note that, for distance matrices, dividing up a large distance matrix call into smaller calls may affect routing, as snapping the origins and destinations to the network is dependent on the other origins and destinations in the function call.
